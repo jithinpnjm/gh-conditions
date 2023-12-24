@@ -44,17 +44,19 @@ jobs:
           name: test-report
           path: test.json
   build:
+    continue-on-error: true
+    strategy:
+      matrix:
+        node-versions: [14,16,18]
     needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Get code
         uses: actions/checkout@v3
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
+      - name: install node
+        uses: actions/setup-node@v3
         with:
-          path: node_modules
-          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+          node-version: ${{ matrix.node-versions }} 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
